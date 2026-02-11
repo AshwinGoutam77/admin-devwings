@@ -1,8 +1,7 @@
 import clientPromise from "@/lib/mongodb";
-import type { MongoClient } from "mongodb";
 
 export async function getOverviewData() {
-  const client: MongoClient = await clientPromise;
+  const client = await clientPromise;
   const db = client.db();
 
   const contactsCount = await db.collection("contacts").countDocuments();
