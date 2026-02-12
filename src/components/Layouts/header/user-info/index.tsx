@@ -106,27 +106,26 @@ export function UserInfo() {
         <hr className="border-[#E8E8E8] dark:border-dark-3" />
 
         <div className="p-2 text-base text-[#4B5563] dark:text-dark-6">
-      <button
-  className="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-[9px] hover:bg-gray-2 hover:text-dark dark:hover:bg-dark-3 dark:hover:text-white"
-  onClick={async () => {
-    try {
-      await fetch("/api/logout", {
-        method: "POST",
-      });
+          <button
+            className="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-[9px] hover:bg-gray-2 hover:text-dark dark:hover:bg-dark-3 dark:hover:text-white"
+            onClick={async () => {
+              try {
+                await fetch("/api/logout", {
+                  method: "POST",
+                });
 
-      setIsOpen(false);
+                setIsOpen(false);
 
-      router.push("/auth/sign-in");
-      router.refresh(); // ensures middleware re-checks
-    } catch (err) {
-      console.error(err);
-    }
-  }}
->
-  <LogOutIcon />
-  <span className="text-base font-medium">Log out</span>
-</button>
-
+                router.push("/auth/sign-in");
+                router.refresh(); // ensures middleware re-checks
+              } catch (err) {
+                console.error(err);
+              }
+            }}
+          >
+            <LogOutIcon />
+            <span className="text-base font-medium">Log out</span>
+          </button>
         </div>
       </DropdownContent>
     </Dropdown>
