@@ -2,32 +2,41 @@ import clientPromise from "@/lib/mongodb";
 
 export async function getOverviewData() {
   const client = await clientPromise;
-  const db = client.db();
+  const db = client.db("Devwings");
 
-  const contactsCount = await db.collection("contacts").countDocuments();
+  const now = new Date();
+  const startOfMonth = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    1
+  );
+
+  const contactsCount = await db
+    .collection("contacts")
+    .countDocuments();
+
   const estimatesCount = await db
     .collection("estimateSubmissions")
     .countDocuments();
+
   const careersCount = await db
     .collection("careerApplications")
     .countDocuments();
 
-  const startOfMonth = new Date(
-    new Date().getFullYear(),
-    new Date().getMonth(),
-    1
-  );
+  const contactsThisMonth = await db
+    .collection("contacts")
+    .countDocuments({ createdAt: { $gte: startOfMonth } });
+
+  const estimatesThisMonth = await db
+    .collection("estimateSubmissions")
+    .countDocuments({ createdAt: { $gte: startOfMonth } });
+
+  const careersThisMonth = await db
+    .collection("careerApplications")
+    .countDocuments({ createdAt: { $gte: startOfMonth } });
 
   const thisMonthCount =
-    (await db.collection("contacts").countDocuments({
-      createdAt: { $gte: startOfMonth },
-    })) +
-    (await db.collection("estimateSubmissions").countDocuments({
-      createdAt: { $gte: startOfMonth },
-    })) +
-    (await db.collection("careerApplications").countDocuments({
-      createdAt: { $gte: startOfMonth },
-    }));
+    contactsThisMonth + estimatesThisMonth + careersThisMonth;
 
   return {
     views: {
@@ -48,6 +57,7 @@ export async function getOverviewData() {
     },
   };
 }
+
 
 
 export async function getChatsData() {
