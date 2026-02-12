@@ -2,17 +2,21 @@
 import { EmailIcon, PasswordIcon } from "@/assets/icons";
 import Link from "next/link";
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import InputGroup from "../FormElements/InputGroup";
 import { Checkbox } from "../FormElements/checkbox";
 
 export default function SigninWithPassword() {
+  const router = useRouter();
+
   const [data, setData] = useState({
-    email: process.env.NEXT_PUBLIC_DEMO_USER_MAIL || "",
-    password: process.env.NEXT_PUBLIC_DEMO_USER_PASS || "",
+    email: "",
+    password: "",
     remember: false,
   });
 
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setData({
@@ -21,20 +25,53 @@ export default function SigninWithPassword() {
     });
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
-    // You can remove this code block
     setLoading(true);
+    setError("");
 
-    setTimeout(() => {
+    try {
+      const res = await fetch("/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: data.email,
+          password: data.password,
+        }),
+      });
+
+      const result = await res.json();
+
+      if (!result.success) {
+        setError(result.message || "Invalid credentials");
+        setLoading(false);
+        return;
+      }
+
+      router.push("/");
+    } catch (err) {
+      setError("Something went wrong");
       setLoading(false);
-    }, 1000);
+    }
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <InputGroup
+    <form onSubmit={handleSubmit} className="flex flex-col items-center">
+      <img
+      className="mb-5"
+        src={"https://devwings.vercel.app/images/logo-devwings.webp"}
+        alt="Logo"
+        width={176}
+        height={32}
+      />
+      <h1 className="mb-10 text-xl font-bold text-dark dark:text-white sm:text-heading-4">
+        Sign in to your account
+      </h1>
+     
+     <div className="w-100">
+       <InputGroup
         type="email"
         label="Email"
         className="mb-4 [&_input]:py-[15px]"
@@ -71,17 +108,20 @@ export default function SigninWithPassword() {
           }
         />
 
-        <Link
+        {/* <Link
           href="/auth/forgot-password"
           className="hover:text-primary dark:text-white dark:hover:text-primary"
         >
           Forgot Password?
-        </Link>
+        </Link> */}
       </div>
+
+      {error && <p className="mb-4 text-sm text-red-500">{error}</p>}
 
       <div className="mb-4.5">
         <button
           type="submit"
+          disabled={loading}
           className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-primary p-4 font-medium text-white transition hover:bg-opacity-90"
         >
           Sign In
@@ -90,6 +130,7 @@ export default function SigninWithPassword() {
           )}
         </button>
       </div>
+     </div>
     </form>
   );
 }

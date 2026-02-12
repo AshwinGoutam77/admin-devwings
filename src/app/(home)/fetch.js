@@ -12,7 +12,6 @@ export async function getOverviewData() {
     .collection("careerApplications")
     .countDocuments();
 
-  // 🔥 This month calculation
   const startOfMonth = new Date(
     new Date().getFullYear(),
     new Date().getMonth(),
